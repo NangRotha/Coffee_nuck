@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 import os
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from . import models, database
 from . import auth as auth_module
 from .database import engine, SessionLocal, get_db
@@ -41,6 +41,68 @@ def create_default_admin():
 
 create_default_admin()
 
+def create_sample_events():
+    db = SessionLocal()
+    try:
+        existing_count = db.query(models.Event).count()
+        if existing_count == 0:
+            sample_events = [
+                models.Event(
+                    title="Summer Coffee Festival",
+                    description="Join us for our annual Summer Coffee Festival! Enjoy 20% off all drinks and live music from local artists.",
+                    event_date=datetime.now() + timedelta(days=7),
+                    discount_percent=20,
+                    is_active=True
+                ),
+                models.Event(
+                    title="Latte Art Workshop",
+                    description="Learn the art of latte from our expert baristas. Limited seats available for hands-on training.",
+                    event_date=datetime.now() + timedelta(days=14),
+                    discount_percent=10,
+                    is_active=True
+                ),
+            ]
+            db.add_all(sample_events)
+            db.commit()
+    finally:
+        db.close()
+
+create_sample_events()
+
+def create_sample_products():
+    db = SessionLocal()
+    try:
+        existing_count = db.query(models.Product).count()
+        if existing_count == 0:
+            sample_products = [
+                models.Product(name="Espresso", description="Strong and bold coffee shot", price=2.50, category="Coffee", status=models.ProductStatus.IN_STOCK, stock_quantity=50),
+                models.Product(name="Cappuccino", description="Espresso with steamed milk foam", price=3.50, category="Coffee", status=models.ProductStatus.IN_STOCK, stock_quantity=45),
+                models.Product(name="Latte", description="Smooth coffee with steamed milk", price=4.00, discount_price=3.50, category="Coffee", status=models.ProductStatus.IN_STOCK, stock_quantity=40),
+                models.Product(name="Croissant", description="Buttery flaky pastry", price=3.00, category="Pastry", status=models.ProductStatus.IN_STOCK, stock_quantity=30),
+            ]
+            db.add_all(sample_products)
+            db.commit()
+    finally:
+        db.close()
+
+create_sample_products()
+
+def create_sample_staff():
+    db = SessionLocal()
+    try:
+        existing_count = db.query(models.Staff).count()
+        if existing_count == 0:
+            sample_staff = [
+                models.Staff(name="John Barista", position="Head Barista", is_manager=True, order_index=0),
+                models.Staff(name="Jane Smith", position="Coffee Specialist", is_manager=False, order_index=1),
+            ]
+            db.add_all(sample_staff)
+            db.commit()
+    finally:
+        db.close()
+
+create_sample_staff()
+
 app = FastAPI(
     title="Coffee Shop API",
     description="API for Coffee Shop Management System",
@@ -55,6 +117,7 @@ app.add_middleware(
         "http://localhost:5174",  # Frontend Admin (Vite default)
         "http://127.0.0.1:5173",
         "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
         "*"  # For development only - restrict in production
     ],
     allow_credentials=True,
