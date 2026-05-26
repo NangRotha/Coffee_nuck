@@ -1,0 +1,22 @@
+# backend/.dockerignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.env
+.venv
+venv
+ENV
+coffee_shop.db
+*.db
+.git
+.gitignore
+README.md
+.vscode
+.idea
